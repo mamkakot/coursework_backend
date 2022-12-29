@@ -4,6 +4,7 @@ from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'chores', ChoreViewSet, 'chores')
+router.register(r'families', FamilyViewSet, 'families')
 router.register(r'rooms', RoomViewSet)
 # router.register(r'users', UserViewSet)
 

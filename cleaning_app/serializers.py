@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Chore, Room
+from .models import Chore, Room, Family
 from django.contrib.auth.models import User
 from django.db.models import Count
 
@@ -8,6 +8,12 @@ from django.db.models import Count
 class ChoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chore
+        fields = '__all__'
+
+
+class FamilySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Family
         fields = '__all__'
 
 

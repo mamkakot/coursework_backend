@@ -22,6 +22,18 @@ class RoomViewSet(viewsets.ModelViewSet):
     # return RoomSerializer
 
 
+class FamilyViewSet(viewsets.ModelViewSet):
+    serializer_class = FamilySerializer
+
+    def get_queryset(self):
+        queryset = Family.objects.all()
+        slave = self.request.query_params.get('slave')
+        if slave is not None:
+            queryset = queryset.filter(familys_slaves__user_id=slave)
+
+        return queryset
+
+
 class ChoreViewSet(viewsets.ModelViewSet):
     # queryset = Chore.objects.all()
     serializer_class = ChoreSerializer
