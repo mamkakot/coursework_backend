@@ -22,7 +22,7 @@ class Room(models.Model):
 
 class Slave(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='familys_slaves')
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='familys_slaves', null=True)
 
     def __str__(self):
         return self.user.__str__()
@@ -63,3 +63,12 @@ class Chore(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class Invite(models.Model):
+    sender = models.ForeignKey(Slave, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
+    is_accepted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.sender.__str__()
