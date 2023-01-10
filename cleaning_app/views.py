@@ -99,7 +99,7 @@ class CreateInvite(APIView):
         sender = Slave.objects.get(user_id__exact=sender_user).id
         print(f"sender {sender}")
         receiver_username = request.data.get("receiver")
-        receiver = User.objects.get(username=receiver_username).id
+        receiver = Slave.objects.get(user__username=receiver_username).id
         serializer = InviteSerializer(data={"sender": sender, "receiver": receiver})
         if serializer.is_valid():
             serializer.save()
