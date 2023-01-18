@@ -55,6 +55,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+DJOSER = {
+    'SERIALIZERS': {
+         'user_create': 'cleaning_app.serializers.UserRegistrationSerializer'
+    }
+}
+
 ROOT_URLCONF = 'coursework_backend.urls'
 
 TEMPLATES = [

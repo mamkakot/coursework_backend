@@ -56,7 +56,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class CreateUserView(APIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -73,7 +73,7 @@ class InviteViewSet(viewsets.ModelViewSet):
         queryset = Invite.objects.all()
         receiver_id = self.request.query_params.get("receiver")
         if receiver_id is not None:
-            queryset = queryset.filter(receiver=receiver_id)  # .distinct("sender")
+            queryset = queryset.filter(receiver=receiver_id).distinct("sender")
         return queryset
 
     def post(self, request):
@@ -84,10 +84,13 @@ class GetInvites(generics.ListAPIView):
     serializer_class = SpecialInviteSerializer
 
     def get_queryset(self):
-        queryset = Invite.objects.all()
+        queryset = Invite.objects.all().distinct('sender__user_id', 'receiver', 'is_join_request')
         receiver_id = self.request.query_params.get("receiver")
+        # queryset = queryset.filter(sender__user_id=[item['sender'] for item in distinct])
+
         if receiver_id is not None:
-            queryset = queryset.filter(receiver=receiver_id)  # .distinct("sender")
+            queryset = queryset.filter(receiver=receiver_id)
+
         return queryset
 
 
@@ -95,16 +98,17 @@ class CreateInvite(APIView):
     serializer_class = SpecialInviteSerializer
 
     def post(self, request):
-        sender_user = int(request.data.get("sender"))
-        sender = Slave.objects.get(user_id__exact=sender_user).id
-        print(f"sender {sender}")
         receiver_username = request.data.get("receiver")
+        sender_user = int(request.data.get("sender"))
         receiver = Slave.objects.get(user__username=receiver_username).id
-        serializer = InviteSerializer(data={"sender": sender, "receiver": receiver})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        sender = Slave.objects.get(user_id__exact=sender_user).id
+        if receiver != sender:
+            print(f"sender {sender}")
+            serializer = InviteSerializer(data={"sender": sender, "receiver": receiver})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ListUsers(APIView):
