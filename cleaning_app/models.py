@@ -67,8 +67,9 @@ class Chore(models.Model):
 
 class Invite(models.Model):
     sender = models.ForeignKey(Slave, on_delete=models.CASCADE, related_name='sender')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
-    is_accepted = models.BooleanField(default=False)
+    receiver = models.ForeignKey(Slave, on_delete=models.CASCADE, related_name='receiver')
+    is_join_request = models.BooleanField(default=False, null=True)
+    is_accepted = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return self.sender.__str__()
