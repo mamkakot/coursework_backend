@@ -59,7 +59,7 @@ class Chore(models.Model):
 
     status = models.BooleanField('chore status')
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='rooms_chores')
-    slave = models.ForeignKey(Slave, on_delete=models.CASCADE)
+    slave = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.name)
