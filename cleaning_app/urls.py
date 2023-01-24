@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('invites/create/', CreateInvite.as_view(), name='invite_create'),
     path('invites/list/', GetInvites.as_view(), name='invite_get'),
+    path('user-family/', GetUserFamily.as_view(), name='user_family_get'),
     path('drf-auth/', include('rest_framework.urls')),
     path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),

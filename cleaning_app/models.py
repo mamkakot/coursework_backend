@@ -23,6 +23,7 @@ class Room(models.Model):
 class Slave(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='familys_slaves', null=True)
+    is_admin = models.BooleanField(null=True)
 
     def __str__(self):
         return self.user.__str__()

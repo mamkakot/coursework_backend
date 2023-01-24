@@ -13,15 +13,6 @@ class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
-    # def get_serializer_class(self):
-    #     if self.action == 'list':
-    #         print('list')
-    #         return RoomSerializer
-    #     if self.action == 'retrieve':
-    #         print('retr')
-    #         return RoomDetailsSerializer
-    # return RoomSerializer
-
 
 class SlaveViewSet(viewsets.ModelViewSet):
     queryset = Slave.objects.all()
@@ -29,7 +20,6 @@ class SlaveViewSet(viewsets.ModelViewSet):
 
 
 class ChoreViewSet(viewsets.ModelViewSet):
-    # queryset = Chore.objects.all()
     serializer_class = ChoreSerializer
 
     def get_queryset(self):
@@ -39,21 +29,6 @@ class ChoreViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(room_id=room)
 
         return queryset
-    #
-    # def put(self, request, pk):
-    #     chore = self.get_object(pk)
-    #     serializer = ChoreSerializer(chore, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # def post(self, request):
-    #     serializer = ChoreSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateUserView(APIView):
@@ -76,9 +51,6 @@ class InviteViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(receiver=receiver_id).distinct("sender")
         return queryset
 
-    def post(self, request):
-        pass
-
 
 class GetInvites(generics.ListAPIView):
     serializer_class = SpecialInviteSerializer
@@ -86,7 +58,6 @@ class GetInvites(generics.ListAPIView):
     def get_queryset(self):
         queryset = Invite.objects.all().distinct('sender__user_id', 'receiver', 'is_join_request')
         receiver_id = self.request.query_params.get("receiver")
-        # queryset = queryset.filter(sender__user_id=[item['sender'] for item in distinct])
 
         if receiver_id is not None:
             queryset = queryset.filter(receiver=receiver_id)
@@ -109,6 +80,14 @@ class CreateInvite(APIView):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetUserFamily(APIView):
+    def get(self, request):
+        user_id = self.request.query_params.get("user")
+
+        family = Slave.objects.get(user_id=user_id).family.id
+        return Response(family)
 
 
 class ListUsers(APIView):
