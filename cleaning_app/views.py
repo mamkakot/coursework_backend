@@ -118,6 +118,14 @@ class CreateInvite(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetUserFamily(APIView):
+    def get(self, request):
+        user_id = request.data.get("user")
+        family = Slave.objects.get(user_id__exact=user_id).family.id
+        if family is not None:
+            return Response(family)
+
+
 class ListUsers(APIView):
     """
     View to list all users in the system.
