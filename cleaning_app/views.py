@@ -28,6 +28,13 @@ class SlaveViewSet(viewsets.ModelViewSet):
     serializer_class = SlaveSerializer
 
 
+class GetUserFamily(APIView):
+    def get(self, request):
+        user_id = request.query_params.get("user")
+        family = Slave.objects.get(user=user_id).family.id
+        return Response(family)
+
+
 class ChoreViewSet(viewsets.ModelViewSet):
     # queryset = Chore.objects.all()
     serializer_class = ChoreSerializer
