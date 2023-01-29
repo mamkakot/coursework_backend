@@ -97,8 +97,8 @@ class CreateInvite(APIView):
 
 class GetUserFamily(APIView):
     def get(self, request):
-        user_id = request.data.get("user")
-        family = Slave.objects.get(user_id__exact=user_id).family.id
+        user_id = self.request.query_params.get("user")
+        family = Slave.objects.get(user=user_id).family.id
         if family is not None:
             return Response(family)
 
