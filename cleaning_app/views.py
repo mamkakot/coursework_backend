@@ -10,17 +10,16 @@ from .serializers import *
 
 
 class RoomViewSet(viewsets.ModelViewSet):
-    queryset = Room.objects.all()
     serializer_class = RoomSerializer
+    queryset = Room.objects.all()
 
-    # def get_serializer_class(self):
-    #     if self.action == 'list':
-    #         print('list')
-    #         return RoomSerializer
-    #     if self.action == 'retrieve':
-    #         print('retr')
-    #         return RoomDetailsSerializer
-    # return RoomSerializer
+    def get_queryset(self):
+        queryset = Room.objects.all()
+        family = self.request.query_params.get('family')
+        if family is not None:
+            queryset = queryset.filter(family_id=family)
+
+        return queryset
 
 
 class SlaveViewSet(viewsets.ModelViewSet):
@@ -41,6 +40,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Chore.objects.all()
         room = self.request.query_params.get('room')
+        print(room)
         if room is not None:
             queryset = queryset.filter(room_id=room)
 
@@ -143,14 +143,6 @@ class CreateInvite(APIView):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class GetUserFamily(APIView):
-#     def get(self, request):
-#         user_id = self.request.query_params.get("user")
-#         family = Slave.objects.get(user_id__exact=user_id).family.id
-#         if family is not None:
-#             return Response(family)
 
 
 class ListUsers(APIView):
