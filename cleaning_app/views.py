@@ -31,12 +31,11 @@ class SlaveViewSet(viewsets.ModelViewSet):
 class GetUserFamily(APIView):
     def get(self, request):
         user_id = request.query_params.get("user")
-        family = Slave.objects.get(user=user_id).family.id
+        family = Slave.objects.get(user_id=user_id).family.id
         return Response(family)
 
 
 class ChoreViewSet(viewsets.ModelViewSet):
-    # queryset = Chore.objects.all()
     serializer_class = ChoreSerializer
 
     def get_queryset(self):
@@ -46,21 +45,6 @@ class ChoreViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(room_id=room)
 
         return queryset
-    #
-    # def put(self, request, pk):
-    #     chore = self.get_object(pk)
-    #     serializer = ChoreSerializer(chore, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # def post(self, request):
-    #     serializer = ChoreSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateUserView(APIView):
@@ -68,9 +52,52 @@ class CreateUserView(APIView):
     serializer_class = UserSerializer
 
 
+class FamilySlaves(generics.ListAPIView):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        serializer = UserSerializer
+        family_id = self.request.query_params.get("family")
+        if family_id is not None:
+            queryset = User.objects.all().filter(slave__family_id=family_id)
+            return queryset
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class FamilyViewSet(viewsets.ModelViewSet):
     serializer_class = FamilySerializer
     queryset = Family.objects.all()
+
+
+class FamilyView(APIView):
+    def post(self, request):
+        user_id = self.request.query_params.get("user")
+        family = FamilySerializer(data=request.data)
+        if family.is_valid():
+            family.save()
+
+            slave = Slave.objects.get(user_id=user_id)
+            print(slave)
+            slave.family_id = family.data['id']
+            slave.is_admin = True
+            slave.save()
+            return Response(family.data)
+        return Response(family.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        user_id = self.request.query_params.get("user")
+        disband = self.request.query_params.get("disband")
+        slave = Slave.objects.get(user_id=user_id)
+        slave_serializer = SlaveSerializer(slave)
+        if slave is not None:
+            slave.family_id = None
+            if disband:
+                slave.is_admin = False
+            else:
+                slave.is_admin = None
+            slave.save()
+            return Response(slave_serializer.data)
+        return Response(slave_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class InviteViewSet(viewsets.ModelViewSet):
@@ -118,12 +145,12 @@ class CreateInvite(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetUserFamily(APIView):
-    def get(self, request):
-        user_id = request.data.get("user")
-        family = Slave.objects.get(user_id__exact=user_id).family.id
-        if family is not None:
-            return Response(family)
+# class GetUserFamily(APIView):
+#     def get(self, request):
+#         user_id = self.request.query_params.get("user")
+#         family = Slave.objects.get(user_id__exact=user_id).family.id
+#         if family is not None:
+#             return Response(family)
 
 
 class ListUsers(APIView):

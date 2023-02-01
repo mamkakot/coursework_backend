@@ -27,9 +27,11 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_admin = serializers.BooleanField(source="slave.is_admin")
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'is_admin']
 
     def create(self, validated_data):
         user = User.objects.create(**validated_data)
